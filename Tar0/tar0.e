@@ -75,3 +75,5 @@ printf(fd_output, "total purchases: %.1f\n", purchases)
 printf(fd_output, "total sales: %.1f\n", sales)
 
 close(fd_output)
+
+-- comment
