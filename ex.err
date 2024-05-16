@@ -1,7 +1,7 @@
-c:\Users\אריאל\source\euforia\PPL5784_7001_1752\test.e:5
-<0132>:: Syntax error - expected to see possibly ')', not a procedure
-puts(1, "Hello2, World!\n")
-   ^
+c:\Users\אריאל\source\euforia\PPL5784_7001_1752\test.e:6
+<0127>:: Punctuation missing in between number and 's'
+    while f.size() do
+            ^
 
 
 --- Defined Words ---

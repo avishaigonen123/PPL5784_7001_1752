@@ -1,6 +1,12 @@
-puts(1, "Hello, World!\n")
+include std/io.e
 
-puts(1, "Hello, World!\n")
+procedure Main()
+    sequence f = {}
+    -- sequence 
+    while f.size() do
+        f += 1
+        ? f
+    end while
+end procedure
 
-puts(1, "Hello2, World!\n")
-
+Main()
