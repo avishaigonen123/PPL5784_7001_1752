@@ -116,7 +116,7 @@ Public & Export & Global & Local Variables
  C:\Euphoria\include\std\machine.e:
     FREE_ARRAY_RID = 1
     page_size = 65536
-    oldprotptr = 9659696
+    oldprotptr = 43360336
     kernel_dll = 140719889842176
     memDLL_id = 140719889842176
     VirtualAlloc_rid = 23
@@ -127,7 +127,7 @@ Public & Export & Global & Local Variables
     system_info_ptr = <no value>
 
  C:\Euphoria\include\std\convert.e:
-    mem = 9660336
+    mem = 43361008
     decimal_mark = 46'.'
 
  C:\Euphoria\include\std\datetime.e:
@@ -227,14 +227,14 @@ Public & Export & Global & Local Variables
     pretty_line = <no value>
 
  C:\Euphoria\include\std\serialize.e:
-    mem0 = 9659728
-    mem1 = 9659729
-    mem2 = 9659730
-    mem3 = 9659731
-    mem4 = 9659732
-    mem5 = 9659733
-    mem6 = 9659734
-    mem7 = 9659735
+    mem0 = 43360400
+    mem1 = 43360401
+    mem2 = 43360402
+    mem3 = 43360403
+    mem4 = 43360404
+    mem5 = 43360405
+    mem6 = 43360406
+    mem7 = 43360407
 
  C:\Euphoria\include\std\text.e:
     lower_case_SET = {}
@@ -244,13 +244,13 @@ Public & Export & Global & Local Variables
     api_CharLowerBuff = 37'%'
     api_CharUpperBuff = 38'&'
     tm_size = 1024
-    temp_mem = 52781408
+    temp_mem = 52562000
 
  C:\Euphoria\include\std\io.e:
-    mem0 = 9659760
-    mem1 = 9659761
-    mem2 = 9659762
-    mem3 = 9659763
+    mem0 = 43360880
+    mem1 = 43360881
+    mem2 = 43360882
+    mem3 = 43360883
 
  C:\Euphoria\include\std\eumem.e:
     ram_space = {}

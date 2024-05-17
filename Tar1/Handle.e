@@ -237,8 +237,8 @@ public procedure handleEq(sequence command)
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
-		"A = M", 					-- A = Ram[SP]
-		"D = M",					-- A = Ram[Ram[SP]]
+		"A = M - 1", 				-- A = Ram[SP] - 1
+		"D = M",					-- A = Ram[Ram[SP] - 1]
 
 		"@" & IS_EQUAL,				-- load label
 		"D; JEQ",                   -- IF D=0 GOTO IS_EQUAL
@@ -247,67 +247,67 @@ public procedure handleEq(sequence command)
 		"@" & END,
 		"0; JMP", 					-- JMP TO end
 		"(" & IS_EQUAL & ")",
-		-- "@-1",
-		"D = D - 1",				-- is TRUE
+		"@0",
+		"D = A - 1",				-- is TRUE
 		"(" & END & ")",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
-		"A = M", 					-- A = Ram[SP]
-		"M = D" 					-- Ram[SP] = D
+		"A = M - 1", 				-- A = Ram[SP] - 1
+		"M = D" 					-- Ram[Ram[SP] - 1] = D
 		
 		})
 end procedure
 
 public procedure handleGt(sequence command)
-	sequence IS_EQUAL = newLable()
+	sequence IS_BIGGER = newLable()
 	sequence END = newLable()
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
-		"A = M", 					-- A = Ram[SP]
-		"D = M",					-- A = Ram[Ram[SP]]
+		"A = M - 1", 				-- A = Ram[SP] - 1
+		"D = M",					-- A = Ram[Ram[SP] - 1]
 
-		"@" & IS_EQUAL,				-- load label
-		"D; JGT",                   -- IF D=0 GOTO IS_EQUAL
+		"@" & IS_BIGGER,				-- load label
+		"D; JGT",                   -- IF D=0 GOTO IS_BIGGER
 		"@0",						-- 
 		"D = A",					-- D = 0
 		"@" & END,
 		"0; JMP", 					-- JMP TO end
-		"(" & IS_EQUAL & ")",
-		-- "@-1",
-		"D = D - 1",				-- is TRUE
+		"(" & IS_BIGGER & ")",
+		"@0",
+		"D = A - 1",				-- is TRUE
 		"(" & END & ")",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
-		"A = M", 					-- A = Ram[SP]
-		"M = D" 					-- Ram[SP] = D
+		"A = M - 1", 				-- A = Ram[SP] - 1
+		"M = D" 					-- Ram[Ram[SP] - 1] = D
 		
 		})
 end procedure
 
 public procedure handleLt(sequence command)
-	sequence IS_EQUAL = newLable()
+	sequence IS_SMALLER = newLable()
 	sequence END = newLable()
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
-		"A = M", 					-- A = Ram[SP]
-		"D = M",					-- A = Ram[Ram[SP]]
+		"A = M - 1", 				-- A = Ram[SP] - 1
+		"D = M",					-- A = Ram[Ram[SP] - 1]
 
-		"@" & IS_EQUAL,				-- load label
-		"D; JLT",                   -- IF D=0 GOTO IS_EQUAL
+		"@" & IS_SMALLER,				-- load label
+		"D; JLT",                   -- IF D=0 GOTO IS_SMALLER
 		"@0",						-- 
 		"D = A",					-- D = 0
 		"@" & END,
 		"0; JMP", 					-- JMP TO end
-		"(" & IS_EQUAL & ")",
-		-- "@-1",
-		"D = D - 1",				-- is TRUE
+		"(" & IS_SMALLER & ")",
+		"@0",						
+		"D = A - 1",				-- is TRUE
 		"(" & END & ")",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
-		"A = M", 					-- A = Ram[SP]
-		"M = D" 					-- Ram[SP] = D
+		"A = M - 1", 				-- A = Ram[SP] - 1
+		"M = D" 					-- Ram[Ram[SP] - 1] = D
 		
 		})
 end procedure
@@ -368,7 +368,7 @@ end procedure
 
 function newLable()
 	counter = counter + 1
-	return "Lable" & counter
+	return "Lable" & to_string(counter)
 end function
 
 /*
