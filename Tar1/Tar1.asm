@@ -1,121 +1,109 @@
 @256
 D = A
-@0
+@SP
 M = D
 @1536
 D = A
-@1
+@LCL
 M = D
 @1792
 D = A
-@2
+@ARG
 M = D
 @2048
 D = A
-@3
+@THIS
 M = D
 @8192
 D = A
-@4
+@THAT
 M = D
 @10
 D = A
-@0
+@SP
 A = M
 M = D
-@0
+@SP
 M = M + 1
-@2
+@InputC.8
 D = A
-@1
-A = M
-D = A + D
 @13
 M = D
-@0
+@SP
 A = M - 1
 D = M
 @13
 A = M
 M = D
-@0
+@SP
 M = M - 1
 @20
 D = A
-@0
+@SP
 A = M
 M = D
-@0
+@SP
 M = M + 1
-@1
+@InputC.15
 D = A
-@5
-D = A + D
 @13
 M = D
-@0
+@SP
 A = M - 1
 D = M
 @13
 A = M
 M = D
-@0
+@SP
 M = M - 1
-@2
-D = A
-@1
-A = M
-A = A + D
+@InputC.8
 D = M
-@0
+@SP
 A = M
 M = D
-@0
+@SP
 M = M + 1
-@1
-D = A
-@5
-A = A + D
+@InputC.15
 D = M
-@0
+@SP
 A = M
 M = D
-@0
+@SP
 M = M + 1
-@0
+@SP
 A = M
 A = A - 1
 D = M
 A = A - 1
 A = M
 D = D + A
-@0
+@SP
 M = M - 1
 A = M - 1 
 M = D
 @1
 D = A
-@2
+@ARG
 A = M
 D = A + D
 @13
 M = D
-@0
+@SP
 A = M - 1
 D = M
 @13
 A = M
 M = D
-@0
+@SP
 M = M - 1
 @1
 D = A
-@2
+@ARG
 A = M
 A = A + D
 D = M
-@0
+@SP
 A = M
 M = D
-@0
+@SP
 M = M + 1

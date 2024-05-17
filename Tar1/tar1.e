@@ -40,13 +40,7 @@ function translate(sequence line, sequence name)
 		case "add" then
 			handleAdd(command)
 		case "sub" then
-      		handleSub(command)
-        case "mult" then
-            handleMult(command)  
-        case "div" then
-            handleDiv(command)  
-		case "neg" then
-			handleEq(command)
+      		handleSub(command) 
 		case "eq" then
       		handleEq(command)
 		case "gt" then
@@ -59,6 +53,8 @@ function translate(sequence line, sequence name)
 			handleOr(command)
     	case "not" then
       		handleNot(command)
+		case "neg" then
+			handleNeg(command)
 		case else
 			return -1
 	end switch
@@ -96,7 +92,6 @@ for i=1 to length(only_vm_filenames) do
 	sequence data_splited = split(only_vm_filenames[i], ".")
 	-- puts(fd_output, "\n" & data_splited[1] & ':' & '\n') -- only for debug
 	sequence data = read_lines(fd_file_input)
-	newClassLabel(data_splited[1])
 	for line=1 to length(data) do
         if length(data[line]) = 0 then
             continue

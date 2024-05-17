@@ -54,10 +54,7 @@ public procedure handlePush(sequence command, sequence name)
 				})
 		case "temp" then
 			printToFile({
-				"@" & command[3], 		-- A = x
-				"D = A", 				-- D = x
-				"@" & labels[TEMP], 	-- A = TEMP
-				"A = A + D", 			-- A = x + TEMP
+				"@" & labels[TEMP0 + to_number(command[3])], 	-- A = TEMPx
 				"D = M", 				-- D = Ram[x + TEMP]
 				"@" & labels[SP], 		-- A = SP
 				"A = M", 				-- A = Ram[SP] -> a = *sp
@@ -68,17 +65,14 @@ public procedure handlePush(sequence command, sequence name)
 				})
 		case "static" then
 			printToFile({
-				"@" & command[3], 		-- A = x
-				"D = A", 				-- D = x
-				"@" & labels[TEMP], 	-- A = TEMP
-				"A = A + D", 			-- A = x + TEMP
-				"D = M", 				-- D = Ram[x + TEMP]
-				"@" & labels[SP], 		-- A = SP
-				"A = M", 				-- A = Ram[SP] -> a = *sp
-				"M = D", 				-- RAM[SP] = Ram[x + Ram[TEMP]]
+				"@" & name & "." & command[3], -- "filename.x"
+				"D = M", 			-- D = Ram[filename.x]
+				"@" & labels[SP], 	-- A = SP
+				"A = M", 			-- A = Ram[SP] -> a = *sp
+				"M = D", 			-- Ram[SP] = x
 				
-				"@" & labels[SP], 		-- A = SP
-				"M = M + 1" 			-- RAM[SP] = Ram[SP] + 1
+				"@" & labels[SP], 	-- A = SP
+				"M = M + 1" 		-- RAM[SP] = Ram[SP] + 1
 				})
 		case "pointer" then
 			printToFile({
@@ -135,10 +129,8 @@ public procedure handlePop(sequence command, sequence name)
 				})
 		case "temp" then
 			printToFile({
-				"@" & command[3],   -- A = x
-				"D = A",            -- D = x
-				"@" & labels[TEMP], -- A = TEMP
-				"D = A + D",		-- D = x + TEMP
+				"@" & labels[TEMP0 + to_number(command[3])], 	-- A = TEMPx
+				"D = A",   			-- TEMPx
 
 				"@" & labels[R1], 	-- 
 				"M = D", 			-- R1 = D
@@ -156,6 +148,25 @@ public procedure handlePop(sequence command, sequence name)
 				"M = M - 1" 		-- RAM[SP] = Ram[SP] - 1
 				})
 		case "static" then
+			printToFile({
+				"@" & name & "." & command[3], -- "filename.x"
+				"D = A", 			-- D = filename.x
+				
+				"@" & labels[R1], 	-- 
+				"M = D", 			-- R1 = D
+				
+				"@" & labels[SP], 	-- A = SP
+				"A = M - 1", 		-- A = Ram[SP] - 1
+				"D = M", 			-- D = Ram[Ram[SP] - 1]
+				
+				"@" & labels[R1], 	-- 
+				"A = M", 			-- A = R1
+				
+				"M = D",             -- Ram[filename.x] = Ram[Ram[SP] - 1]
+
+				"@" & labels[SP], 	-- A = SP
+				"M = M - 1" 		-- RAM[SP] = Ram[SP] - 1
+				})
 		case "pointer" then
 			printToFile({
 				"@" & labels[THIS + to_number(command[3])], 
@@ -218,35 +229,142 @@ public procedure handleSub(sequence command)
 		})
 end procedure
 
-public procedure handleMult(sequence command)  
-end procedure
-
-public procedure handleDiv(sequence command)  
-end procedure
-
 public procedure handleEq(sequence command)
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
-		"D = M",						-- A = Ram[Ram[SP]]
-		""
+		"D = M",					-- A = Ram[Ram[SP]]
+
+		"@" & labels[SP], 			-- A = SP
+		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
+
+		"@IS_EQUAL",				-- load label
+		"D; JEQ",                   -- IF D=0 GOTO IS_EQUAL
+		"@0",						-- 
+		"D = A",					-- D = 0
+		"@END",
+		"0; JMP", 					-- JMP TO end
+		"(IS_EQUAL)",
+		"@-1",
+		"D = A",					-- is TRUE
+		"(END)",					-- D = 0 | -1
+
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"M = D", 					-- Ram[SP] = D
+		
+		"@" & labels[SP], 			-- A = SP
+		"M = M + 1" 				-- RAM[SP] = Ram[SP] + 1
 		})
 end procedure
 
 public procedure handleGt(sequence command)
+	handleSub({})
+	printToFile({
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"D = M",					-- A = Ram[Ram[SP]]
+
+		"@" & labels[SP], 			-- A = SP
+		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
+
+		"@IS_EQUAL",				-- load label
+		"D; JGT",                   -- IF D=0 GOTO IS_EQUAL
+		"@0",						-- 
+		"D = A",					-- D = 0
+		"@END",
+		"0; JMP", 					-- JMP TO end
+		"(IS_EQUAL)",
+		"@-1",
+		"D = A",					-- is TRUE
+		"(END)",					-- D = 0 | -1
+
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"M = D", 					-- Ram[SP] = D
+		
+		"@" & labels[SP], 			-- A = SP
+		"M = M + 1" 				-- RAM[SP] = Ram[SP] + 1
+		})
 end procedure
 
 public procedure handleLt(sequence command)
+	handleSub({})
+	printToFile({
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"D = M",					-- A = Ram[Ram[SP]]
+
+		"@" & labels[SP], 			-- A = SP
+		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
+
+		"@IS_EQUAL",				-- load label
+		"D; JLT",                   -- IF D=0 GOTO IS_EQUAL
+		"@0",						-- 
+		"D = A",					-- D = 0
+		"@END",
+		"0; JMP", 					-- JMP TO end
+		"(IS_EQUAL)",
+		"@-1",
+		"D = A",					-- is TRUE
+		"(END)",					-- D = 0 | -1
+
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"M = D", 					-- Ram[SP] = D
+		
+		"@" & labels[SP], 			-- A = SP
+		"M = M + 1" 				-- RAM[SP] = Ram[SP] + 1
+		})
 end procedure
 
 public procedure handleAnd(sequence command)
+	printToFile({
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"A = A - 1",
+		"D = M", 					-- D = Ram[Ram[SP] - 1], arg1
+        "A = A - 1",
+		"A = M", 					-- A = Ram[Ram[SP] - 2], arg2
+		"D = D & A", 				-- D = arg1 & arg2
+		"@" & labels[SP], 			-- A = SP
+		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
+		"A = M - 1 ",				-- A = Ram[SP] - 1
+		"M = D" 					-- Ram[Ram[SP] - 1] = arg1 * arg2
+		})
 end procedure
 
 public procedure handleOr(sequence command)
+	printToFile({
+		"@" & labels[SP], 			-- A = SP
+		"A = M", 					-- A = Ram[SP]
+		"A = A - 1",
+		"D = M", 					-- D = Ram[Ram[SP] - 1], arg1
+        "A = A - 1",
+		"A = M", 					-- A = Ram[Ram[SP] - 2], arg2
+		"D = D | A", 				-- D = arg1 | arg2
+		"@" & labels[SP], 			-- A = SP
+		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
+		"A = M - 1 ",				-- A = Ram[SP] - 1
+		"M = D" 					-- Ram[Ram[SP] - 1] = arg1 | arg2
+		})
 end procedure
 
 public procedure handleNot(sequence command)
+	printToFile({
+		"@" & labels[SP], 			-- A = SP
+		"A = M - 1",				-- A = Ram[SP] - 1
+		"M = !M" 					-- Ram[Ram[SP] - 1] = !Ram[Ram[SP] - 1]
+		})
+end procedure
+
+public procedure handleNeg(sequence command)
+	printToFile({
+		"@" & labels[SP], 			-- A = SP
+		"A = M - 1",				-- A = Ram[SP] - 1
+		"M = -M" 					-- Ram[Ram[SP] - 1] = -Ram[Ram[SP] - 1]
+		})
 end procedure
 
 procedure printToFile(sequence asmCommands)
@@ -255,11 +373,6 @@ procedure printToFile(sequence asmCommands)
 	end for
 end procedure
 
-public function newClassLabel(sequence name)
-	sequence res = "@" & name & to_string(counter)
-	counter = counter + 1
-	return res
-end function
 /*
 implementing all the command functions
 */
