@@ -3,7 +3,7 @@ include ./tar1.e
 include ./enums.e
 include std/convert.e
 
-integer counter = 0
+integer counter = -1
 
 public procedure build()
 	/*
@@ -232,22 +232,24 @@ public procedure handleSub(sequence command)
 end procedure
 
 public procedure handleEq(sequence command)
+	sequence IS_EQUAL = newLable()
+	sequence END = newLable()
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
 		"D = M",					-- A = Ram[Ram[SP]]
 
-		"@IS_EQUAL",				-- load label
+		"@" & IS_EQUAL,				-- load label
 		"D; JEQ",                   -- IF D=0 GOTO IS_EQUAL
 		"@0",						-- 
 		"D = A",					-- D = 0
-		"@END",
+		"@" & END,
 		"0; JMP", 					-- JMP TO end
-		"(IS_EQUAL)",
+		"(" & IS_EQUAL & ")",
 		-- "@-1",
 		"D = D - 1",				-- is TRUE
-		"(END)",					-- D = 0 | -1
+		"(" & END & ")",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
@@ -257,62 +259,56 @@ public procedure handleEq(sequence command)
 end procedure
 
 public procedure handleGt(sequence command)
+	sequence IS_EQUAL = newLable()
+	sequence END = newLable()
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
 		"D = M",					-- A = Ram[Ram[SP]]
 
-		"@" & labels[SP], 			-- A = SP
-		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
-
-		"@IS_EQUAL",				-- load label
+		"@" & IS_EQUAL,				-- load label
 		"D; JGT",                   -- IF D=0 GOTO IS_EQUAL
 		"@0",						-- 
 		"D = A",					-- D = 0
-		"@END",
+		"@" & END,
 		"0; JMP", 					-- JMP TO end
-		"(IS_EQUAL)",
-		"@-1",
-		"D = A",					-- is TRUE
-		"(END)",					-- D = 0 | -1
+		"(" & IS_EQUAL & ")",
+		-- "@-1",
+		"D = D - 1",				-- is TRUE
+		"(" & END & ")",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
-		"M = D", 					-- Ram[SP] = D
+		"M = D" 					-- Ram[SP] = D
 		
-		"@" & labels[SP], 			-- A = SP
-		"M = M + 1" 				-- RAM[SP] = Ram[SP] + 1
 		})
 end procedure
 
 public procedure handleLt(sequence command)
+	sequence IS_EQUAL = newLable()
+	sequence END = newLable()
 	handleSub({})
 	printToFile({
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
 		"D = M",					-- A = Ram[Ram[SP]]
 
-		"@" & labels[SP], 			-- A = SP
-		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
-
-		"@IS_EQUAL",				-- load label
+		"@" & IS_EQUAL,				-- load label
 		"D; JLT",                   -- IF D=0 GOTO IS_EQUAL
 		"@0",						-- 
 		"D = A",					-- D = 0
-		"@END",
+		"@" & END,
 		"0; JMP", 					-- JMP TO end
-		"(IS_EQUAL)",
-		"@-1",
-		"D = A",					-- is TRUE
-		"(END)",					-- D = 0 | -1
+		"(" & IS_EQUAL & ")",
+		-- "@-1",
+		"D = D - 1",				-- is TRUE
+		"(" & END & ")",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
-		"M = D", 					-- Ram[SP] = D
+		"M = D" 					-- Ram[SP] = D
 		
-		"@" & labels[SP], 			-- A = SP
-		"M = M + 1" 				-- RAM[SP] = Ram[SP] + 1
 		})
 end procedure
 
@@ -369,6 +365,11 @@ procedure printToFile(sequence asmCommands)
 		printf(fd_output, asmCommands[i] & "\n")
 	end for
 end procedure
+
+function newLable()
+	counter = counter + 1
+	return "Lable" & counter
+end function
 
 /*
 implementing all the command functions
