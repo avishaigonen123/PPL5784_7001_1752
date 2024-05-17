@@ -6,6 +6,7 @@ include std/convert.e
 integer counter = 0
 
 public procedure build()
+	/*
 	printToFile({
 		-- intialize the SP to address 256 
 				"@" & address[SP], 		-- A = 256
@@ -33,6 +34,7 @@ public procedure build()
 				"@" & labels[THAT], 	-- A = label[THAT]
 				"M = D" 				-- Ram[THAT] = address[THAT]
 				})
+				*/
 end procedure
 
 public procedure handlePush(sequence command, sequence name)
@@ -221,7 +223,7 @@ public procedure handleSub(sequence command)
 		"D = M", 					-- D = Ram[Ram[SP] - 1], arg1
         "A = A - 1",
 		"A = M", 					-- A = Ram[Ram[SP] - 2], arg2
-		"D = D - A", 				-- D = arg1 - arg2
+		"D = A - D", 				-- D = arg2 - arg1
 		"@" & labels[SP], 			-- A = SP
 		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
 		"A = M - 1 ",				-- A = Ram[SP] - 1
@@ -236,9 +238,6 @@ public procedure handleEq(sequence command)
 		"A = M", 					-- A = Ram[SP]
 		"D = M",					-- A = Ram[Ram[SP]]
 
-		"@" & labels[SP], 			-- A = SP
-		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
-
 		"@IS_EQUAL",				-- load label
 		"D; JEQ",                   -- IF D=0 GOTO IS_EQUAL
 		"@0",						-- 
@@ -246,16 +245,14 @@ public procedure handleEq(sequence command)
 		"@END",
 		"0; JMP", 					-- JMP TO end
 		"(IS_EQUAL)",
-		"@-1",
-		"D = A",					-- is TRUE
+		-- "@-1",
+		"D = D - 1",				-- is TRUE
 		"(END)",					-- D = 0 | -1
 
 		"@" & labels[SP], 			-- A = SP
 		"A = M", 					-- A = Ram[SP]
-		"M = D", 					-- Ram[SP] = D
+		"M = D" 					-- Ram[SP] = D
 		
-		"@" & labels[SP], 			-- A = SP
-		"M = M + 1" 				-- RAM[SP] = Ram[SP] + 1
 		})
 end procedure
 

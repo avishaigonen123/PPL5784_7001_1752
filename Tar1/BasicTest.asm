@@ -1,23 +1,3 @@
-@256
-D = A
-@SP
-M = D
-@1536
-D = A
-@LCL
-M = D
-@1792
-D = A
-@ARG
-M = D
-@2048
-D = A
-@THIS
-M = D
-@8192
-D = A
-@THAT
-M = D
 @10
 D = A
 @SP

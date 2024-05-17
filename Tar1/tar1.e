@@ -62,12 +62,12 @@ function translate(sequence line, sequence name)
 end function
 
 sequence path
--- path = prompt_string("Give me path: ")
-path = "C:\\Users\\avish\\OneDrive\\Desktop\\ekronot\\PPL5784_7001_1752\\Tar1\\"
+path = prompt_string("Give me path: ")
+-- path = "C:\\Users\\avish\\OneDrive\\Desktop\\ekronot\\nand2tetris\\projects\\07\\MemoryAccess\\BasicTest"
 sequence path_elems = split_path(path)
 sequence name_dir = path_elems[length(path_elems)]
 sequence output_filename = name_dir & ".asm"
-fd_output = open(output_filename, "w") -- create output file in Asm langauage
+fd_output = open(path & "\\" & output_filename, "w") -- create output file in Asm langauage
 
 build() -- inisialize the asm file
 
@@ -88,12 +88,12 @@ for i=1 to length(filenames) do
 end for
 -- loop on every input file and to the translation
 for i=1 to length(only_vm_filenames) do 
-	integer fd_file_input = open(only_vm_filenames[i],"r")
+	integer fd_file_input = open(path & "\\"& only_vm_filenames[i],"r") 
 	sequence data_splited = split(only_vm_filenames[i], ".")
 	-- puts(fd_output, "\n" & data_splited[1] & ':' & '\n') -- only for debug
 	sequence data = read_lines(fd_file_input)
 	for line=1 to length(data) do
-        if length(data[line]) = 0 then
+        if length(data[line]) = 0 or begins("//", data[line]) then 
             continue
         end if
         if translate(data[line], data_splited[1]) = -1 then
@@ -105,5 +105,3 @@ end for
 
 
 close(fd_output)
-
--- comment
