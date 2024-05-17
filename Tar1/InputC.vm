@@ -1,11 +1,11 @@
 push constant 10
-pop local 2
+pop static 8
 
 push constant 20
-pop temp 1
+pop static 15
 
-push local 2
-push temp 1
+push static 8
+push static 15
 add
 
 pop argument 1

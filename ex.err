@@ -1,3 +1,24 @@
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\tar1.e:95
+<0074>:: Errors resolving the following references:
+	'newClassLabel' (Tar1\tar1.e:95) has not been declared.
+
+	newClassLabel(data_splited[1])
+	             ^
+
+
+--- Defined Words ---
+EU4
+EU4_1
+EU4_1_0
+WINDOWS
+WIN32
+CONSOLE
+X86_64
+BITS64
+LONG32
+EUI
+-------------------
+
 D:\Euphoria\git\PPL5784_7001_1752\Tar1\tar1.e:17 in function find_files_in_current_dir() 
 type_check failure, files is -1 
     _path = {67'C',58':',92'\',85'U',115's',101'e',114'r',115's',92'\',97'a',
