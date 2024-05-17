@@ -1,9 +1,7 @@
-c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\tar1.e:95
-<0074>:: Errors resolving the following references:
-	'newClassLabel' (Tar1\tar1.e:95) has not been declared.
-
-	newClassLabel(data_splited[1])
-	             ^
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\Handle.e:256
+<0135>:: Syntax error - expected to see an expression, not '}'
+		})
+		^
 
 
 --- Defined Words ---
