@@ -1,7 +1,7 @@
-d:\Euphoria\git\PPL5784_7001_1752\Tar1\Handle.e:235
-<0101>:: illegal character in source
-	sequence IS_EQUAL = newLable();
-	                              ^
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\Handle.e:381
+<0132>:: Syntax error - expected to see possibly '}', not a character string
+ 		"@" & command[2],
+ 		  ^
 
 
 --- Defined Words ---

@@ -55,6 +55,12 @@ function translate(sequence line, sequence name)
       		handleNot(command)
 		case "neg" then
 			handleNeg(command)
+		case "label" then
+			handleLabel(command)
+		case "goto"	then	
+			handleGoto(command)
+		case "if-goto" then
+			handleIfGoto(command)
 		case else
 			return -1
 	end switch
@@ -81,7 +87,7 @@ sequence filenames = find_files_in_current_dir(path)
 sequence only_vm_filenames ={}
 for i=1 to length(filenames) do 
 	sequence data_splited = split(filenames[i], ".")
-	sequence ending = data_splited[2]
+	sequence ending = data_splited[2] 	
 		if equal(ending, "vm") then 
 		only_vm_filenames=append(only_vm_filenames,filenames[i])
 	end if

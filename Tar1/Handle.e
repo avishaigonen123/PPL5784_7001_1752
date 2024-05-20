@@ -360,6 +360,31 @@ public procedure handleNeg(sequence command)
 		})
 end procedure
 
+public procedure handleLabel(sequence command)
+	printToFile({
+		"(" & command[2] & ")"
+	})
+end procedure
+
+public procedure handleGoto(sequence command)
+	printToFile({
+ 		"@" & command[2],
+		"0; JEQ" 					-- jmp to A
+	})
+end procedure
+
+public procedure handleIfGoto(sequence command)
+	printToFile({
+		"@SP",  			 
+		"MA = M - 1", 				-- MA = Ram[SP] - 1
+		"D = M",            		-- D = Ram[Ram[SP] - 1]
+ 		"@" & command[2],
+		"D; JNE" 					-- jmp to C if D!=0 
+	})
+end procedure
+
+
+
 procedure printToFile(sequence asmCommands)
 	for i = 1 to length(asmCommands) do
 		printf(fd_output, asmCommands[i] & "\n")
