@@ -31,39 +31,47 @@ end function
 
 function translate(sequence line, sequence name)
 	sequence command = split(line, " ")
+	sequence asm = {}
  -- puts(fd_output, "@" & join(command, "_") & '\n')
 	switch command[1] do
 		case "pop" then
-    		handlePop(command, name)
+    		asm = handlePop(command, name)
 		case "push" then
-    		handlePush(command, name)
+    		asm = handlePush(command, name)
 		case "add" then
-			handleAdd(command)
+			asm = handleAdd(command)
 		case "sub" then
-      		handleSub(command) 
+      		asm = handleSub(command)
 		case "eq" then
-      		handleEq(command)
+      		asm = handleEq(command)
 		case "gt" then
-			handleGt(command)
+			asm = handleGt(command)
 		case "lt" then
-			handleLt(command)
+			asm = handleLt(command)
 		case "and" then
-			handleAnd(command)
+			asm = handleAnd(command)
 		case "or" then
-			handleOr(command)
+			asm = handleOr(command)
     	case "not" then
-      		handleNot(command)
+      		asm = handleNot(command)
 		case "neg" then
-			handleNeg(command)
+			asm = handleNeg(command)
 		case "label" then
-			handleLabel(command)
+			asm = handleLabel(command, name)
 		case "goto"	then	
-			handleGoto(command)
+			asm = handleGoto(command, name)
 		case "if-goto" then
-			handleIfGoto(command)
+			asm = handleIfGoto(command, name)
+		case "call" then
+            asm = handleCall(command, name)
+		case "function" then
+			asm = handleFunction(command, name)
+		case "return" then
+            asm = handleReturn(command, name)
 		case else
 			return -1
 	end switch
+	printToFile(asm)
 	return 0
 end function
 

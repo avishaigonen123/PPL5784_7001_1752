@@ -1,1 +1,5 @@
 eq
+
+label bla
+
+jmp bla
