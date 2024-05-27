@@ -2,10 +2,20 @@ include std/io.e
 include ./tar1.e
 include ./enums.e
 include std/convert.e
+include std/sequence.e
 
 integer counter = -1
 
 public procedure build()
+	/*printToFile(
+		{
+			"@256",
+			"D = A",
+			"@SP", -- 
+			"M = D"
+
+		} & handleCall({"call", "Sys.init", "0"}, "bla")
+		)*/
 end procedure
 
 -- pop the value of D to the top of the stack
@@ -55,6 +65,7 @@ public function handlePush(sequence command, sequence name)
 	switch command[2] do
 		case "local", "that", "this", "argument" then
 			asm = {
+					"// " & join(command, " "),
 					"@" & command[3], 		-- A = x
 					"D = A", 				-- D = x
 					"@" & labels[mapCommendToLabels(command[2])], 		-- A = LCL
@@ -66,6 +77,7 @@ public function handlePush(sequence command, sequence name)
 
 		case "temp" then
 			asm = {
+					"// " & join(command, " "),
 					"@" & labels[TEMP0 + to_number(command[3])], 	-- A = TEMPx
 					"D = M" 				-- D = Ram[x + TEMP]
 				} & 
@@ -73,6 +85,7 @@ public function handlePush(sequence command, sequence name)
 
 		case "static" then
 			asm = {
+					"// " & join(command, " "),
 					"@" & name & "." & command[3], -- "filename.x"
 					"D = M" 			-- D = Ram[filename.x]
 				} & 
@@ -80,6 +93,7 @@ public function handlePush(sequence command, sequence name)
 
 		case "pointer" then
 			asm = {
+					"// " & join(command, " "),
 					"@" & labels[THIS + to_number(command[3])], 	-- A = this | that
 					"D = M" 				-- D = Ram[this | that]
 				} & 
@@ -87,6 +101,7 @@ public function handlePush(sequence command, sequence name)
 
 		case "constant" then
 			asm = {
+					"// " & join(command, " "),
 					"@" & command[3] 	-- A = x
 				} &
 					push_A()
@@ -103,6 +118,7 @@ public function handlePop(sequence command, sequence name)
 	switch command[2] do
 		case "local", "that", "this", "argument" then
 			asm = {
+					"// " & join(command, " "),
 					"@" & command[3],   -- A = x
 					"D = A",            -- D = x
 					"@" & labels[mapCommendToLabels(command[2])], 	-- A = LCL
@@ -113,6 +129,7 @@ public function handlePop(sequence command, sequence name)
                 
 		case "temp" then
 			asm = {
+				"// " & join(command, " "),
 				"@" & labels[TEMP0 + to_number(command[3])], 	-- A = TEMPx
 				"D = A"   			-- TEMPx
 				} & 
@@ -120,6 +137,7 @@ public function handlePop(sequence command, sequence name)
 				
 		case "static" then
 			asm = {
+				"// " & join(command, " "),
 				"@" & name & "." & command[3], -- "filename.x"
 				"D = A" 			-- D = filename.x
 				} & 
@@ -127,6 +145,7 @@ public function handlePop(sequence command, sequence name)
 				
 		case "pointer" then
 			asm = {
+				"// " & join(command, " "),
 				"@" & labels[THIS + to_number(command[3])], 
 									-- A = THIS if 0, THAT if 1
 				"D = A"				-- D = A
@@ -179,7 +198,7 @@ public function handleEq(sequence command)
 	sequence IS_EQUAL = newLable()
 	sequence END = newLable()
 	
-	return handleSub({})
+	return 	handleSub({})
 		&{
 		"@" & labels[SP], 			-- A = SP
 		"A = M - 1", 				-- A = Ram[SP] - 1
@@ -206,7 +225,7 @@ end function
 public function handleGt(sequence command)
 	sequence IS_BIGGER = newLable()
 	sequence END = newLable()
-	return handleSub({})
+	return	handleSub({})
 		&{
 		"@" & labels[SP], 			-- A = SP
 		"A = M - 1", 				-- A = Ram[SP] - 1
@@ -233,7 +252,7 @@ end function
 public function handleLt(sequence command)
 	sequence IS_SMALLER = newLable()
 	sequence END = newLable()
-	return handleSub({})
+	return 	handleSub({})
 		&{
 		"@" & labels[SP], 			-- A = SP
 		"A = M - 1", 				-- A = Ram[SP] - 1
@@ -307,24 +326,26 @@ end function
 
 public function handleLabel(sequence command, sequence name)
 	return {
-		"(" & name & "." & command[2] & ")"
+		"(" & command[2] & ")"
 	}
 end function
 
 public function handleGoto(sequence command, sequence name)
 	return {
- 		"@" & name & "." & command[2],
+		"// " & join(command, " "),
+ 		"@" & command[2],
 		"0; JEQ" 					-- jmp to A
 	}
 end function
 
 public function handleIfGoto(sequence command, sequence name)
 	return {
+		"// " & join(command, " "),
 		"@SP",  			 
 		"M = M - 1", 				-- Ram[SP] = Ram[SP] - 1
 		"A = M", 					-- A = Ram[SP] - 1
 		"D = M",            		-- D = Ram[Ram[SP] - 1]
- 		"@" & name & "." & command[2],
+ 		"@" & command[2],
 		"D; JNE" 					-- jmp to C if D!=0 
 	}
 end function
@@ -332,8 +353,9 @@ end function
 public function handleCall(sequence command, sequence name)
 	sequence RETURN_ADDRESS =  newLable()
 	return {
+		"// " & join(command, " "),
 -- push return-address
-			"@" & RETURN_ADDRESS
+			"@" & RETURN_ADDRESS 
 		}& 
 			push_A()
 		&{
@@ -386,17 +408,19 @@ public function handleCall(sequence command, sequence name)
 end function
 
 public function handleFunction(sequence command, sequence name)
-	sequence f =  newLable()
+	sequence LOOP =  newLable()
+	sequence AFTER =  newLable()
     return {		
-			"(" & name & "." & command[2] & ")",
+		"// " & join(command, " "),
+			"(" & command[2] & ")",
 			"@" & command[3],
 			"D = A",
--- (f)
-            "(" & f & ")",						-- repeat k times
+-- (LOOP)
+            "(" & LOOP & ")",						-- repeat k times
 			"@" & labels[R1], 					-- 
 			"M = D",							-- R1 = D
-			"@" & f, 							-- if D isn't zero, repeat.
-			"D; JNE" 							
+			"@" & AFTER, 							-- if D isn't zero, repeat.
+			"D; JEQ" 				
         }& 
 -- PUSH 0
           	handlePush({"push", "constant", "0"}, name)
@@ -404,7 +428,10 @@ public function handleFunction(sequence command, sequence name)
 -- repeat k times
 			"@" & labels[R1], 	-- 
 			"D = M", 			-- A = R1"	
-			"D = D - 1"
+			"D = D - 1",
+			"@" & LOOP, 							-- if D isn't zero, repeat.
+			"0; JMP", 
+			"(" & AFTER & ")"						-- after loop
 		}
         
 end function
@@ -412,7 +439,7 @@ end function
 
 public function handleReturn(sequence command, sequence name)
 	return {
-
+			"// " & join(command, " "),
 -- FRAME=LCL									-- R2 will be FRAME
 			"@LCL", 							
 			"D = M", 							-- D = Ram[LCL]
@@ -428,7 +455,7 @@ public function handleReturn(sequence command, sequence name)
 			
 -- *ARG=POP()
             "@ARG",
-			"D = A"                            -- D = ARG
+			"D = M"                            -- D = ARG
 		}&
         	pop_D()
 		&{

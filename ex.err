@@ -1,7 +1,7 @@
-c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\Handle.e:381
-<0132>:: Syntax error - expected to see possibly '}', not a character string
- 		"@" & command[2],
- 		  ^
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\tar1.e:71
+<0133>:: Syntax error - Unknown namespace 'C' used
+			C:\Users\avish\OneDrive\Desktop\ekronot\nand2tetris\projects\08\FunctionCalls\FibonacciElementcase else
+			 ^
 
 
 --- Defined Words ---
