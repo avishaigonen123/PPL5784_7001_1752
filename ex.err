@@ -1,7 +1,7 @@
-c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar1\tar1.e:71
-<0133>:: Syntax error - Unknown namespace 'C' used
-			C:\Users\avish\OneDrive\Desktop\ekronot\nand2tetris\projects\08\FunctionCalls\FibonacciElementcase else
-			 ^
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar4\tar4.e:49
+<0056>:: character constant is missing a closing '
+	integer fd_file_input = open(path & "\\" & only_jack_filenames[i] & '.jack',"r") 
+	                                                                      ^
 
 
 --- Defined Words ---
