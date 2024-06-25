@@ -1,0 +1,25 @@
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar4\Parsing.e:126
+<0074>:: Errors resolving the following references:
+	'indent' (Parsing.e:18) has not been declared.
+	'indent' (Parsing.e:17) has not been declared.
+	'indent' (Parsing.e:19) has not been declared.
+	'pek' (Parsing.e:125) has not been declared.
+	'pek' (Parsing.e:124) has not been declared.
+	'pek' (Parsing.e:126) has not been declared.
+
+    if pek = "int" or pek = "char" or pek = "boolean" then
+                                          ^
+
+
+--- Defined Words ---
+EU4
+EU4_1
+EU4_1_0
+WINDOWS
+WIN32
+CONSOLE
+X86_64
+BITS64
+LONG32
+EUI
+-------------------

@@ -5,6 +5,7 @@ include std/search.e
 include std/filesys.e
 include std/convert.e
 include ./Tokenizing.e
+include ./parsing.e
 
 -- file desciprtor for output file
 global integer fd_output
@@ -56,9 +57,14 @@ for i=1 to length(only_jack_filenames) do
     end if
 
     tokenizeAnalyser(fd_file_input, fd_output)
-    -- pasrsing(fd_file_input, fd_output)  
 
-	close(fd_file_input)
+	integer fd_file_input_parsing = fd_output
+	integer fd_file_output_parsing = open(path & "\\" & only_jack_filenames[i] & ".xml","w") 
+
+    parsing(fd_file_input_parsing, fd_file_output_parsing)
+
+	close(fd_file_input_parsing)
+	close(fd_file_output_parsing)
     close(fd_output)
 end for
 

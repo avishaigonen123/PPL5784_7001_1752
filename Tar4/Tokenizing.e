@@ -1,4 +1,3 @@
-include xml/euXML25.e
 include std/io.e
 include std/types.e
 include std/search.e
@@ -6,6 +5,7 @@ include std/search.e
 sequence keywords = {
     "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return"
 }
+
 
 sequence symbol = {
     '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~'
