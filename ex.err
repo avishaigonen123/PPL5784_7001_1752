@@ -1,7 +1,7 @@
-c:\Users\אריאל\source\euforia\PPL5784_7001_1752\test.e:6
-<0127>:: Punctuation missing in between number and 's'
-    while f.size() do
-            ^
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar4\tar4.e:49
+<0056>:: character constant is missing a closing '
+	integer fd_file_input = open(path & "\\" & only_jack_filenames[i] & '.jack',"r") 
+	                                                                      ^
 
 
 --- Defined Words ---
