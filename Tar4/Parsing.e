@@ -1,40 +1,44 @@
 include std/io.e
 include std/types.e
 include std/search.e
-
-/*sequence keywords = {
-    "class", "constructor", "function", "method", "field", "static", "var", "int", "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return"
-}
-
-sequence symbol = {
-    '{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~'
-}*/
+include std/sequence.e
 
 integer fd_file_output
 integer fd_file_input
 
 -- write to xml file
 procedure writeToFile(sequence string, integer indent_size)
-    indent = '\t' * indent_size
+    sequence indent = ""
+    for i = 1 to indent_size do
+        indent &= "  "
+    end for
     printf(fd_file_output, indent & string)
 end procedure
 
 -- this function take the next line, and return it. It procced to next line
 function nextToken()
-    return ""
+    return gets(fd_file_input)
 end function
 
 -- this function see the next line, and return it. It doesn't procced to next line
 function peek()
-    return ""
+    integer pos = where(fd_file_input)
+    if pos = -1 then
+        return ""
+    end if
+    sequence tok = nextToken()
+    sequence res = split(tok, ' ') -- get the value of the token
+    seek(fd_file_input, pos)
+    return res[2]
 end function
 
 public procedure parsing(integer _fd_file_input, integer _fd_file_output)
     fd_file_input = _fd_file_input
     fd_file_output = _fd_file_output
 
+    gets(fd_file_input)
     class(0)
-
+    gets(fd_file_input)
 end procedure
 
 
@@ -47,22 +51,27 @@ end procedure
 ---------------------------------------------------------------------------------------------
 -- deduction rule for keyward
 procedure keyward(integer indent_number)
+    writeToFile(nextToken(), indent_number)
 end procedure
 
 -- deduction rule for symbol
 procedure symbol(integer indent_number)
+    writeToFile(nextToken(), indent_number)
 end procedure
 
 -- deduction rule for integerConstant
 procedure integerConstant(integer indent_number)
+    writeToFile(nextToken(), indent_number)
 end procedure
 
 -- deduction rule for StringConstant
 procedure StringConstant(integer indent_number)
+    writeToFile(nextToken(), indent_number)
 end procedure
 
 -- deduction rule for identifier
 procedure identifier(integer indent_number)
+    writeToFile(nextToken(), indent_number)
 end procedure
 
 
@@ -71,35 +80,38 @@ end procedure
 ---------------------------------------------------------------------------------------------
 -- dediction rule for class
 -- class --> 'class' className '{' classVarDec* subroutineDec* '}'
-procedure class(integer indent_number)  
-    printf(fd_file_output, "<class>\n")
-    indent_number = indent_number + 1 -- increase indent number
+procedure class(integer indent_number)
+    writeToFile("<class>\n", indent_number)
 
+    indent_number = indent_number + 1 -- increase indent number
     writeToFile(nextToken(), indent_number) -- 'class'
     className(indent_number)
     
     writeToFile(nextToken(), indent_number) -- '{'
     
     sequence pek = peek()
-    while pek = "static" or pek = "field" do
+     
+    
+    while compare(pek, "static")=0 or compare(pek, "field")=0 do
         classVarDec(indent_number) -- classVarDec
         pek = peek()
     end while
-    
-    while pek = "constructor" or pek = "function" or pek = "method" do
+
+    while compare(pek, "constructor")=0 or compare(pek, "function")=0 or compare(pek, "method")=0 do
         subroutineDec(indent_number) -- subroutineDec
         pek = peek()
     end while
-    
+   
+
     writeToFile(nextToken(), indent_number) -- '}'
-    
-    printf(fd_file_output, "</class>\n")
+    writeToFile("</class>\n", indent_number -1)
 end procedure
 
 
 -- deduction rule for classVarDec
 procedure classVarDec(integer indent_number)
-    printf(fd_file_output, "<classVarDec>\n")
+    writeToFile("<classVarDec>\n", indent_number)
+
     indent_number = indent_number + 1 -- increase indent number
 
     writeToFile(nextToken(), indent_number) -- 'static' |  'field'
@@ -108,7 +120,7 @@ procedure classVarDec(integer indent_number)
     varName(indent_number) -- varName
 
     sequence pek = peek()
-    while pek = "," do 
+    while compare(pek, ",")=0 do 
         writeToFile(nextToken(), indent_number) -- ','
         varName(indent_number) -- varName
         pek = peek()
@@ -116,15 +128,16 @@ procedure classVarDec(integer indent_number)
 
     writeToFile(nextToken(), indent_number) -- ';'
     
-    printf(fd_file_output, "</classVarDec>\n")
+    writeToFile("</classVarDec>\n", indent_number - 1)
 end procedure
 
 
 -- deduction rule for type
 procedure _type(integer indent_number)
-    pek = peek()
-    if pek = "int" or pek = "char" or pek = "boolean" then
-        writeToFile(nextToken(), indent_number) -- 'int' or 'char' or 'boolean'
+    sequence pek = peek()
+    if compare(pek, "int")=0
+         or compare(pek, "char")=0 or compare(pek, "boolean")=0 then -- 'int' or 'char' or 'boolean'
+        writeToFile(nextToken(), indent_number) 
     else 
         className(indent_number) -- className
     end if
@@ -133,13 +146,14 @@ end procedure
 
 -- deduction rule for subroutineDec
 procedure subroutineDec(integer indent_number)
-    printf(fd_file_output, "<subroutineDec>\n")
+    writeToFile("<subroutineDec>\n", indent_number)
+
     indent_number = indent_number + 1 -- increase indent number
 
     writeToFile(nextToken(), indent_number) -- 'constructor' | 'function' | 'method'
 
     sequence pek = peek()
-    if pek = "void" then
+    if compare(pek, "void")=0 then
         writeToFile(nextToken(), indent_number) -- 'void'
     else
         _type(indent_number) -- _type
@@ -151,24 +165,43 @@ procedure subroutineDec(integer indent_number)
     parameterList(indent_number) -- parameterList
     writeToFile(nextToken(), indent_number) -- ')'
     subroutineBody(indent_number) -- subroutineBody
-    
-    printf(fd_file_output, "</subroutineDec>\n")
+
+    writeToFile("</subroutineDec>\n", indent_number-1)
 end procedure
 
 -- deduction rule for parameterList
 procedure parameterList(integer indent_number)
+    writeToFile("<parameterList>\n", indent_number)
+    
+    indent_number = indent_number + 1 -- increase indent number
+    
+    sequence pek = peek() 
+    if compare(pek,")")!=0 then -- ')', the follow
+        _type(indent_number) -- type
+        varName(indent_number) -- varName
+
+        pek = peek()
+        while compare(pek, ",")=0 do 
+            writeToFile(nextToken(), indent_number) -- ','
+            _type(indent_number) -- type
+            varName(indent_number) -- varName
+            pek = peek()
+        end while
+    end if
+
+    writeToFile("</parameterList>\n", indent_number-1)
     
 end procedure
 
 -- deduction rule for subroutineBody
 procedure subroutineBody(integer indent_number)
-    printf(fd_file_output, "<subroutineBody>\n")
+    writeToFile("<subroutineBody>\n", indent_number)
+
     indent_number = indent_number + 1 -- increase indent number
 
     writeToFile(nextToken(), indent_number) -- '{'
-
     sequence pek = peek()
-    while pek = "var" do 
+    while compare(pek, "var") = 0 do 
         varDec(indent_number) -- varDec
         pek = peek()
     end while
@@ -176,19 +209,21 @@ procedure subroutineBody(integer indent_number)
     statements(indent_number) -- statements
     writeToFile(nextToken(), indent_number) -- '}'
     
-    printf(fd_file_output, "</subroutineBody>\n")
+    writeToFile("</subroutineBody>\n", indent_number - 1)
 end procedure
 
 -- deduction rule for varDec
 procedure varDec(integer indent_number)
-    printf(fd_file_output, "<varDec>\n")
+    writeToFile("<varDec>\n", indent_number)
+    
     indent_number = indent_number + 1 -- increase indent number
 
+    writeToFile(nextToken(), indent_number) -- "var"
     _type(indent_number) -- type
     varName(indent_number) -- varName
 
     sequence pek = peek()
-    while pek = "," do 
+    while compare(pek, ",") = 0 do 
         writeToFile(nextToken(), indent_number) -- ','
         varName(indent_number) -- varName
         pek = peek()
@@ -196,7 +231,8 @@ procedure varDec(integer indent_number)
 
     writeToFile(nextToken(), indent_number) -- ';'
     
-    printf(fd_file_output, "</varDec>\n")
+    writeToFile("</varDec>\n", indent_number - 1)
+
 end procedure
 
 -- deduction rule for className
@@ -220,43 +256,46 @@ end procedure
 ---------------------------------------------------------------------------------------------
 -- deduction rule for statements
 procedure statements(integer indent_number)
+    writeToFile("<statements>\n", indent_number)
+    indent_number = indent_number + 1 -- increase indent number
     sequence pek = peek()
-    while pek = "let" or pek = "if" or pek = "while" or pek = "do" or "return" do 
+    while compare(pek, "let")=0 or compare(pek, "if")=0 or compare(pek, "while")=0 or compare(pek, "do")=0 or compare(pek, "return")=0 do 
         statement(indent_number) -- statement
         pek = peek()
     end while
+    
+    writeToFile("</statements>\n", indent_number - 1)
 end procedure
 
 -- deduction rule for statement
 procedure statement(integer indent_number)
-    printf(fd_file_output, "<statement>\n")
-    indent_number = indent_number + 1 -- increase indent number
     
     sequence pek = peek()
-    if pek = "let" then
+    if compare(pek, "let")=0 then
         letStatement(indent_number)
-    elsif pek = "if" then
+    elsif compare(pek, "if")=0 then
         ifStatement(indent_number)
-    elsif pek = "while" then
+    elsif compare(pek, "while")=0 then
         whileStatement(indent_number)
-    elsif pek = "do" then
+    elsif compare(pek, "do")=0 then
         doStatement(indent_number)
-    elsif pek = "return" then
+    elsif compare(pek, "return")=0 then
         ReturnStatement(indent_number)
     end if
-    printf(fd_file_output, "</statement>\n")
+
 end procedure
 
 -- deduction rule for letStatement
 procedure letStatement(integer indent_number)
-    printf(fd_file_output, "<letStatement>\n")
+    writeToFile("<letStatement>\n", indent_number)
+
     indent_number = indent_number + 1 -- increase indent number
     
     writeToFile(nextToken(), indent_number) -- 'let'
     varName(indent_number) -- 'varName'
     
     sequence pek = peek()
-    if pek = '[' then
+    if compare(pek, "[")=0 then 
         writeToFile(nextToken(), indent_number) -- '['
         expression(indent_number)
         writeToFile(nextToken(), indent_number) -- ']'
@@ -265,23 +304,39 @@ procedure letStatement(integer indent_number)
     expression(indent_number)
     writeToFile(nextToken(), indent_number) -- ';'
 
-    printf(fd_file_output, "</letStatement>\n")
+    writeToFile("</letStatement>\n", indent_number - 1)
 end procedure
 
 -- deduction rule for ifStatement
 procedure ifStatement(integer indent_number)
-    writeToFile(nextToken(), indent_number) -- 'while'
+    writeToFile("<ifStatement>\n", indent_number)
+    indent_number = indent_number + 1 -- increase indent number
+
+    writeToFile(nextToken(), indent_number) -- 'if'
     writeToFile(nextToken(), indent_number) -- '('
     expression(indent_number) -- expression
     writeToFile(nextToken(), indent_number) -- ')'
     writeToFile(nextToken(), indent_number) -- '{'
-    statements(indent_number) -- statements
+    statements(indent_number) -- statements 
     writeToFile(nextToken(), indent_number) -- '}'
-    
+
+    sequence pek = peek()
+    if compare(pek, "else")=0 then 
+        writeToFile(nextToken(), indent_number) -- 'else'
+        writeToFile(nextToken(), indent_number) -- '{'
+        statements(indent_number)
+        writeToFile(nextToken(), indent_number) -- '}'
+    end if
+
+
+    writeToFile("</ifStatement>\n", indent_number-1)
 end procedure
 
 -- deduction rule for whileStatement
 procedure whileStatement(integer indent_number)
+    writeToFile("<whileStatement>\n", indent_number)
+    indent_number = indent_number + 1 -- increase indent number
+
     writeToFile(nextToken(), indent_number) -- 'while'
     writeToFile(nextToken(), indent_number) -- '('
     expression(indent_number) -- expression
@@ -290,20 +345,35 @@ procedure whileStatement(integer indent_number)
     statements(indent_number) -- statements
     writeToFile(nextToken(), indent_number) -- '}'
 
-    subroutineCall(indent_number) -- subroutineCall
-    writeToFile(nextToken(), indent_number) -- ';'
+    
+    writeToFile("</whileStatement>\n", indent_number-1)
 end procedure
 
 -- deduction rule for doStatement
 procedure doStatement(integer indent_number)
+    writeToFile("<doStatement>\n", indent_number)
+    indent_number = indent_number + 1 -- increase indent number
+
     writeToFile(nextToken(), indent_number) -- 'do'
     subroutineCall(indent_number) -- subroutineCall
     writeToFile(nextToken(), indent_number) -- ';'
+
+    writeToFile("</doStatement>\n", indent_number-1)
 end procedure
 
 -- deduction rule for ReturnStatement
 procedure ReturnStatement(integer indent_number)
-    
+    writeToFile("<returnStatement>\n", indent_number)
+    indent_number = indent_number + 1 -- increase indent number
+
+    writeToFile(nextToken(), indent_number) -- "return"
+
+    sequence pek = peek()
+    if compare(pek, ";")!=0 then
+        expression(indent_number)
+    end if
+    writeToFile(nextToken(), indent_number) -- ';'
+    writeToFile("</returnStatement>\n", indent_number-1)
 end procedure
 
 ---------------------------------------------------------------------------------------------
@@ -312,64 +382,114 @@ end procedure
 
 -- deduction rule for expression
 procedure expression(integer indent_number)
-    printf(fd_file_output, "<expression>\n")
+    writeToFile("<expression>\n", indent_number)
     indent_number = indent_number + 1 -- increase indent number
+    
     term(indent_number) -- term
     sequence pek = peek()
-    while pek = "+" or pek = "-" or pek = "*" or pek = "/" or pek = "&" or pek = "|" or pek = "<" or pek = ">" or pek = "=" 
+    while compare(pek, "+")=0 or compare(pek, "-")=0 or compare(pek, "*")=0 or compare(pek, "/")=0 or compare(pek, "&amp;")=0 or compare(pek, "|")=0 or compare(pek, "&lt;")=0 or compare(pek, "&gt;")=0 or compare(pek, "=")=0 
     do 
         op(indent_number) -- op
         term(indent_number) -- term
         pek = peek()
     end while
     
-    printf(fd_file_output, "</expression>\n")
+    writeToFile("</expression>\n", indent_number-1)
 end procedure
 
 -- deduction rule for term
 procedure term(integer indent_number)
+    writeToFile("<term>\n", indent_number)
 
+    indent_number = indent_number + 1 -- increase indent number
+    
+    sequence pek = peek()
+    if compare(pek, "(")=0 then 
+        writeToFile(nextToken(), indent_number) -- '('
+        expression(indent_number) -- expression
+        writeToFile(nextToken(), indent_number) -- ')'
+        
+    elsif compare(pek,"-")=0 or compare(pek,"~")=0 then -- '-' or '~'
+        unaryOp(indent_number) -- unaryOp
+        term(indent_number) -- term
+    
+    else -- all other :(
+        sequence res = nextToken() -- nextToken, "not" plaster
+        pek = peek()
+        if compare(pek,"[")=0 then -- '['
+            writeToFile(res, indent_number) -- write res to file
+
+            writeToFile(nextToken(), indent_number) -- '['
+            expression(indent_number)
+            writeToFile(nextToken(), indent_number) -- ']'
+        elsif compare(pek, "(")=0 or compare(pek, ".")=0 then -- '(' or '.'
+            subroutineCall(indent_number, res)
+        else
+            writeToFile(res, indent_number) -- write res to file
+        end if
+    end if
+        
+    writeToFile("</term>\n", indent_number-1)
 end procedure
 
 -- deduction rule for subroutineCall
-procedure subroutineCall(integer indent_number)
+procedure subroutineCall(integer indent_number, sequence cheetim = "")
+    if compare(cheetim, "")=0 then
+        identifier(indent_number) -- class name var name and subrottin name is identifier
+    else 
+        writeToFile(cheetim, indent_number) -- '{'
+    end if
     
+    sequence pek = peek()
+    if compare(pek, ".") = 0 then
+        writeToFile(nextToken(), indent_number) -- '.'
+        subroutineName(indent_number)
+    end if
+    writeToFile(nextToken(), indent_number) -- '('
+    expressionList(indent_number)
+    writeToFile(nextToken(), indent_number) -- ')'
 end procedure
 
 -- deduction rule for expressionList
 procedure expressionList(integer indent_number)
+    writeToFile("<expressionList>\n", indent_number)
 
+    indent_number = indent_number + 1 -- increase indent number
+    
+    sequence pek = peek()
+    if compare(pek, ")") != 0 then -- follow is )
+    
+        expression(indent_number) -- expression
+        pek = peek()
+        while compare(pek, ",")=0 do 
+            writeToFile(nextToken(), indent_number) -- ','
+            expression(indent_number) -- expression
+            pek = peek()
+        end while
+    end if
+    
+    writeToFile("</expressionList>\n", indent_number-1)
 end procedure
 
 -- deduction rule for op
 procedure op(integer indent_number)
-    printf(fd_file_output, "<op>\n")
-    indent_number = indent_number + 1 -- increase indent number
-    
     writeToFile(nextToken(), indent_number) -- '+' or '-' or '* or '/' or '&' or '|' or '<' or '>' or '='   
-     
-    printf(fd_file_output, "</op>\n")
-
 end procedure
 
 -- deduction rule for unaryOp
-procedure unaryOp(integer indent_number)
-    printf(fd_file_output, "<unaryOp>\n")
-    indent_number = indent_number + 1 -- increase indent number
-    
+procedure unaryOp(integer indent_number)    
     writeToFile(nextToken(), indent_number) -- '-' or '~'
-
-    printf(fd_file_output, "</unaryOp>\n")
 end procedure
 
 -- deduction rule for KeywordConstant
 procedure KeywordConstant(integer indent_number)
-    printf(fd_file_output, "<KeywordConstant>\n")
+    writeToFile("<KeywordConstant>\n", indent_number)
+
     indent_number = indent_number + 1 -- increase indent number
     
     writeToFile(nextToken(), indent_number) -- 'true' or 'false' or 'null' or 'this'
 
-    printf(fd_file_output, "</KeywordConstant>\n")
+    writeToFile("</KeywordConstant>\n", indent_number-1)
 end procedure
 
 

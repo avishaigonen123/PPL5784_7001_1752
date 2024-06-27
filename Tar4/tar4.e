@@ -49,7 +49,7 @@ for i=1 to length(only_jack_filenames) do
 
 	integer fd_file_input = open(path & "\\" & only_jack_filenames[i] & ".jack","r") 
 	
-    sequence output_filename = only_jack_filenames[i] & "Tour.xml"
+    sequence output_filename = only_jack_filenames[i] & "T_our.xml"
     fd_output = open(path & "\\" & output_filename, "w") -- create output file in xml format
 
     if fd_output = -1 then
@@ -57,9 +57,9 @@ for i=1 to length(only_jack_filenames) do
     end if
 
     tokenizeAnalyser(fd_file_input, fd_output)
-
-	integer fd_file_input_parsing = fd_output
-	integer fd_file_output_parsing = open(path & "\\" & only_jack_filenames[i] & ".xml","w") 
+	close(fd_output)
+	integer fd_file_input_parsing = open(path & "\\" & output_filename, "r") -- create intput file in xml format
+	integer fd_file_output_parsing = open(path & "\\" & only_jack_filenames[i] & "_our.xml","w") 
 
     parsing(fd_file_input_parsing, fd_file_output_parsing)
 
