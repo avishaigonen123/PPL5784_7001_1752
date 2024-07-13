@@ -1,7 +1,7 @@
-d:\BigFiles\Projects\LLP\PPL5784_7001_1752\Tar5\SymbolTable.e:21
-<0076>:: expected to see an assignment after 'subrottinIndex', such as =, +=, -=, *=, /= or &=
-            subrottinIndex++
-                          ^
+c:\Users\avish\OneDrive\Desktop\ekronot\PPL5784_7001_1752\Tar5\Parsing.e:38
+<0132>:: Syntax error - expected to see possibly ']', not ':'
+    return splited[2:-1]ש
+                    ^
 
 
 --- Defined Words ---

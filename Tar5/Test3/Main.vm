@@ -1,0 +1,21 @@
+function Main.main 1
+push constant 0
+pop local 0
+label L0
+push local 0
+push constant 10
+gt
+not
+not
+if-goto L1
+push local 0
+call Output.printInt 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto L0
+label L1
+push constant 0
+return
